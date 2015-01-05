@@ -35,6 +35,7 @@ angular.module('loomioApp').controller 'InvitationsModalController', ($scope, $m
     $scope.isDisabled = false
     $scope.invitations = []
     $modalInstance.close()
+    Records.memberships.fetchByGroup $scope.group
 
   $scope.saveError = (error) ->
     $scope.isDisabled = false

@@ -15,6 +15,7 @@ class AngularSupportController < ApplicationController
                     username: 'mingthemerciless'}
 
   GROUP_NAME = 'Dirty Dancing Shoes'
+  OTHER_GROUP_NAME = 'Wendigo Winnebagos'
 
   DISCUSSION_TITLE = 'What star sign are you?'
 
@@ -25,8 +26,7 @@ class AngularSupportController < ApplicationController
     reset_database
     sign_in patrick
     testing_group.update! members_can_add_members: true
-
-    User.create(COMMENTER_PARAMS)
+    introduce_patrick_to_max
 
     redirect_to_group
   end
@@ -93,8 +93,18 @@ class AngularSupportController < ApplicationController
     Group.where(name: GROUP_NAME).first
   end
 
+  def other_testing_group
+    Group.where(name: OTHER_GROUP_NAME).first
+  end
+
   def testing_discussion
     testing_group.discussions.first
+  end
+
+  def introduce_patrick_to_max
+    group = Group.create! name: OTHER_GROUP_NAME, privacy: 'private'
+    group.add_member! patrick
+    group.add_member! max
   end
 
   def reset_database
@@ -103,6 +113,11 @@ class AngularSupportController < ApplicationController
     if testing_group.present?
       testing_group.users.each(&:destroy)
       testing_group.destroy
+    end
+
+    if other_testing_group.present?
+      other_testing_group.users.each(&:destroy)
+      other_testing_group.destroy
     end
 
     patrick = User.create!(USER_PARAMS)

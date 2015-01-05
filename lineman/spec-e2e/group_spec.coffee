@@ -7,4 +7,6 @@ describe 'Group Page', ->
     page.loadForInvitations()
     expect(page.invitePeopleLink().isPresent()).toBe(true)
     page.invitePerson('max')
-    expect(page.members()).toContain('Max Von Sydow')
+    page.sendInvitations()
+    expect(page.groupHasMember('mingthemerciless')).toBe(true)
+  , 100000

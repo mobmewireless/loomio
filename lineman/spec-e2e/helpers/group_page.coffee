@@ -12,15 +12,14 @@ module.exports = class GroupPage
   invitePerson: (fragment) ->
     @invitePeopleLink().click()
     element(By.model('fragment')).sendKeys(fragment)
+    browser.wait => @firstInvitable().isPresent()
     @firstInvitable().click()
 
   sendInvitations: ->
-    element(By.css('.cuke-group-invitation-submit'))
+    element(By.css('.cuke-group-invitation-submit')).click()
 
   firstInvitable: ->
-    element(By.css('.cuke-group-invitable-option')).first()
+    element(By.css('.cuke-group-invitable-option'))
 
-  addInvitation: ->
-
-  members: ->
-    []
+  groupHasMember: (username) ->
+    element(By.css(".group-member-list-avatar[data-username=#{username}]")).isPresent()
