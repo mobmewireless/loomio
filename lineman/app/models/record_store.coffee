@@ -4,6 +4,10 @@ angular.module('loomioApp').factory 'RecordStore', () ->
       @db = db
       @collectionNames = []
 
+    addEndpointInterface: (endpointsInterfaceClass) ->
+      endpointsInterface = new endpointsInterfaceClass(@)
+      @[endpointsInterface.endpoint] = endpointsInterface
+
     addRecordsInterface: (recordsInterfaceClass) ->
       recordsInterface = new recordsInterfaceClass(@)
       name = recordsInterface.model.plural
