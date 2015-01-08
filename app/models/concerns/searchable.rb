@@ -53,6 +53,15 @@ module Searchable
            #{to_s.downcase}_id = :id"
       end
     end
+
+    def search_for(query, limit: 10)
+      connection.execute sanitize_sql_array [
+        "SELECT #{to_s.downcase}_id
+         FROM   #{search_vector_class.table_name}
+         WHERE  to_tsvector(search_data) @@ to_tsquery(:query)
+         LIMIT  :limit", query: query, limit: limit
+      ]
+    end
   end
 
   def sync_search_vector!
