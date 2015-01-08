@@ -1,14 +1,25 @@
 Search = Struct.new(:user, :query, :limit) do
+
+  # I imagine these will get more complicated / distinct as we discover more advanced search options
   def discussion_results
-    @discussion_results ||= select_results(Discussion)
+    @discussions ||= begin
+      ids = SearchVectors::Discussion.search_for(query, limit: limit)
+      wrap_search_results Discussion.find(ids)
+    end
   end
 
   def motion_results
-    @motion_results     ||= select_results(Motion)
+    @motions ||= begin
+      ids = SearchVectors::Motion.search_for(query, limit: limit)
+      wrap_search_results Motion.find(ids)
+    end
   end
 
   def comment_results
-    @comment_results    ||= select_results(Comment)
+    @comments ||= begin
+      ids = SearchVectors::Comment.search_for(query, limit: limit)
+      wrap_search_results Comment.find(ids)
+    end
   end
 
   def results
@@ -21,14 +32,9 @@ Search = Struct.new(:user, :query, :limit) do
 
   private
 
-  def select_results(model)
+  def wrap_search_results(models)
     [].tap do |results|
-      raw_results(model).each_with_index { |id, index| results << SearchResult.new(model.find(id), query, index) }
+      models.each_with_index { |model, index| results << SearchResult.new(model, query, index) }
     end
   end
-
-  def raw_results(model)
-    model.search_for(query, limit: limit).to_a.map(&:values).flatten
-  end
-
 end

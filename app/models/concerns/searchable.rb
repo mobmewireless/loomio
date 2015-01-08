@@ -3,18 +3,10 @@ module Searchable
 
   included do
     after_save :sync_search_vector!, if: :searchable_fields_modified?
-
-    has_one search_vector_name, class_name: search_vector_class
-    alias :search_vector        :"#{search_vector_name}"
-    alias :search_vector=       :"#{search_vector_name}="
-    alias :create_search_vector :"build_#{search_vector_name}"
-    alias :build_search_vector  :"create_#{search_vector_name}"
+    has_one :search_vector, class_name: search_vector_class
   end
 
   module ClassMethods
-    def search_vector_name
-      :"#{to_s.downcase}_search_vector"
-    end
 
     def search_vector_class
       "SearchVectors::#{to_s}".constantize
@@ -23,49 +15,10 @@ module Searchable
     def searchable(on: [])
       define_singleton_method :searchable_fields, -> { Array(on) }
     end
-
-    def sync_search_vector!(searchable)
-      connection.execute sanitize_sql_array [
-        search_vector_sync_query(searchable),
-        id:            searchable.id,
-        search_data:   searchable.search_data,
-        search_method: searchable.search_method
-      ]
-    end
-
-    def search_vector_sync_query(searchable)
-      if searchable.search_vector.blank?
-        "INSERT INTO
-          #{search_vector_class.table_name}
-        (#{to_s.downcase}_id, search_data, search_vector)
-        VALUES (
-          :id,
-          :search_data,
-          to_tsvector(:search_method, :search_data)
-        )"
-      else
-        "UPDATE
-           #{search_vector_class.table_name}
-         SET
-           search_vector = to_tsvector(:search_method, :search_data),
-           search_data = :search_data
-         WHERE
-           #{to_s.downcase}_id = :id"
-      end
-    end
-
-    def search_for(query, limit: 10)
-      connection.execute sanitize_sql_array [
-        "SELECT #{to_s.downcase}_id
-         FROM   #{search_vector_class.table_name}
-         WHERE  to_tsvector(search_data) @@ to_tsquery(:query)
-         LIMIT  :limit", query: query, limit: limit
-      ]
-    end
   end
 
   def sync_search_vector!
-    self.class.sync_search_vector! self.reload
+    self.class.search_vector_class.sync_searchable! self
   end
 
   def search_data

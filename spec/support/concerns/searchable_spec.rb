@@ -8,12 +8,6 @@ shared_examples_for Searchable do
     described_class.searchable on: searchable_test_field
   end
 
-  describe 'search_vector_name' do
-    it 'returns the name of the search vector' do
-      expect(described_class.search_vector_name).to eq :"#{described_model_name}_search_vector"
-    end
-  end
-
   describe 'searchable_fields' do
     it 'is created through the searchable on: method' do
       expect(described_class.searchable_fields).to include searchable_test_field
