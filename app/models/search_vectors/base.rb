@@ -2,6 +2,7 @@ class SearchVectors::Base < ActiveRecord::Base
   self.abstract_class = true
 
   def self.search_for(query, limit: 10)
+    query = "#{query}:*" #start_with search
     connection.execute(sanitize_sql_array [
       "SELECT #{resource_class}_id
        FROM   #{table_name}
