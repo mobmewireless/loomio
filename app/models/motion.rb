@@ -22,6 +22,9 @@ class Motion < ActiveRecord::Base
   include Translatable
   is_translatable on: [:name, :description]
 
+  include Searchable
+  searchable on: [:name, :description]
+
   include PgSearch
   pg_search_scope :search, against: [:name, :description],
     using: {tsearch: {dictionary: "english"}}

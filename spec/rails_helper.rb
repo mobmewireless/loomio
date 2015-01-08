@@ -53,3 +53,7 @@ RSpec.configure do |config|
       to_return(status: 200, body: "stubbed response", headers: {})
   end
 end
+
+def described_model_name
+  described_class.model_name.singular
+end
