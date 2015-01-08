@@ -6,7 +6,7 @@ class Comment < ActiveRecord::Base
   has_paper_trail
   acts_as_tree
   is_translatable on: :body
-  is_searchable on: :body
+  searchable on: :body
 
   belongs_to :discussion, counter_cache: true
   belongs_to :user
