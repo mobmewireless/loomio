@@ -31,7 +31,6 @@ shared_examples_for Searchable do
 
     it 'is updated when the searchable fields are updated' do
       searchable.save!
-      puts "this is the one!"
       searchable.update! searchable_test_field => 'new field value'
       expect(searchable.reload.search_vector).to be_present
       expect(searchable.search_vector.search_data).to match /new field value/

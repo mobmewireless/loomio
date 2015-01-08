@@ -56,7 +56,7 @@ module Searchable
   end
 
   def sync_search_vector!
-    self.class.sync_search_vector! self
+    self.class.sync_search_vector! self.reload
   end
 
   def search_data
