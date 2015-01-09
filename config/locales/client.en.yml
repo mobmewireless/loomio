@@ -40,7 +40,9 @@ en:
     search:
       placeholder: 'Search for groups or threads'
       loading: 'Loading results...'
-      search_results: 'Search results'
+      discussions: 'Threads'
+      proposals: 'Proposals'
+      comments: 'Comments'
       no_results: 'No results found'
 
   notifications:

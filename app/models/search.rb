@@ -23,11 +23,7 @@ Search = Struct.new(:user, :query, :limit) do
   end
 
   def results
-    {
-      discussions: discussion_results,
-      motions:     motion_results,
-      comments:    comment_results
-    }
+    discussion_results + motion_results + comment_results
   end
 
   private

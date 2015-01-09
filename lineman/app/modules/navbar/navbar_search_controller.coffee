@@ -1,5 +1,9 @@
 angular.module('loomioApp').controller 'NavbarSearchController', ($scope, UserAuthService, Records, SearchResultModel) ->
   $scope.searchResults = []
+  $scope.discussions   = []
+  $scope.proposals     = []
+  $scope.comments      = []
+
   $scope.searching = false
 
   $scope.noResultsFound = ->
@@ -14,4 +18,7 @@ angular.module('loomioApp').controller 'NavbarSearchController', ($scope, UserAu
       Records.search_results.fetchByFragment($scope.query).then (response) ->
         $scope.searchResults = _.map response.search_results, (result) ->
           Records.search_results.initialize result
+        $scope.discussions = _.filter $scope.searchResults, (result) -> result.isDiscussion()
+        $scope.proposals   = _.filter $scope.searchResults, (result) -> result.isProposal()
+        $scope.comments    = _.filter $scope.searchResults, (result) -> result.isComment()
         $scope.searching = false
