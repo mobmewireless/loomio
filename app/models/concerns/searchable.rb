@@ -15,6 +15,10 @@ module Searchable
     def searchable(on: [])
       define_singleton_method :searchable_fields, -> { Array(on) }
     end
+
+    def rebuild_search_index!
+      find_each(:batch_size => 100).map(&:sync_search_vector!)
+    end
   end
 
   def sync_search_vector!
