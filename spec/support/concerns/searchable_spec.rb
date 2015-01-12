@@ -4,32 +4,20 @@ shared_examples_for Searchable do
 
   let(:searchable) { build described_model_name, searchable_test_field => 'my test field' }
 
-  before do
-    described_class.searchable on: searchable_test_field
-  end
-
-  describe 'searchable_fields' do
-    it 'is created through the searchable on: method' do
-      expect(described_class.searchable_fields).to include searchable_test_field
-    end
-  end
-
   describe 'search_vector' do
     it 'is created when the searchable is created' do
       searchable.save!
       expect(searchable.reload.search_vector).to be_present
-      expect(searchable.search_vector.search_data).to match /my test field/
       expect(searchable.search_vector.search_vector).to match /'test':2/
       expect(searchable.search_vector.search_vector).to match /'field':3/
     end
 
     it 'is updated when the searchable fields are updated' do
       searchable.save!
-      searchable.update! searchable_test_field => 'new field value'
+      searchable.update! searchable_test_field => 'new field val'
       expect(searchable.reload.search_vector).to be_present
-      expect(searchable.search_vector.search_data).to match /new field value/
       expect(searchable.search_vector.search_vector).to match /'field':2/
-      expect(searchable.search_vector.search_vector).to match /'value':3/
+      expect(searchable.search_vector.search_vector).to match /'val':3/
     end
   end
 
