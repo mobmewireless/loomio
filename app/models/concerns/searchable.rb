@@ -7,36 +7,24 @@ module Searchable
   end
 
   module ClassMethods
-
-    def search_vector_class
-      "SearchVectors::#{to_s}".constantize
-    end
-
-    def searchable(on: [])
-      define_singleton_method :searchable_fields, -> { Array(on) }
-    end
-
     def rebuild_search_index!
       find_each(:batch_size => 100).map(&:sync_search_vector!)
+    end
+
+    def search_vector_class
+      @search_vector_class ||= "SearchVectors::#{to_s}".constantize
     end
   end
 
   def sync_search_vector!
     self.class.search_vector_class.sync_searchable! self
   end
-
-  def search_data
-    self.class.searchable_fields.map { |field| send(field).to_s }.join " "
-  end
-
-  def search_method
-    :simple
-  end
+  handle_asynchronously :sync_search_vector!
 
   private
 
   def searchable_fields_modified?
-    (self.changed.map(&:to_sym) & self.class.searchable_fields).any?
+    (self.changed.map(&:to_sym) & self.class.search_vector_class.searchable_fields).any?
   end
 
 end

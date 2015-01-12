@@ -4,21 +4,21 @@ Search = Struct.new(:user, :query, :limit) do
   def discussion_results
     @discussions ||= begin
       ids = SearchVectors::Discussion.search_for(query, limit: limit)
-      wrap_search_results Discussion.find(ids)
+      wrap_search_results Queries::VisibleDiscussions.new(user: user).where(id: ids)
     end
   end
 
   def motion_results
     @motions ||= begin
       ids = SearchVectors::Motion.search_for(query, limit: limit)
-      wrap_search_results Motion.find(ids)
+      wrap_search_results Queries::VisibleMotions.new(user: user).where(id: ids)
     end
   end
 
   def comment_results
     @comments ||= begin
       ids = SearchVectors::Comment.search_for(query, limit: limit)
-      wrap_search_results Comment.find(ids)
+      wrap_search_results Queries::VisibleComments.new(user: user).where(id: ids)
     end
   end
 

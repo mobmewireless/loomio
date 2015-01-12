@@ -7,8 +7,6 @@ class Discussion < ActiveRecord::Base
   include Translatable
   include Searchable
 
-  searchable on: [:title, :description]
-
   scope :archived, -> { where('archived_at is not null') }
   scope :published, -> { where(archived_at: nil, is_deleted: false) }
 
