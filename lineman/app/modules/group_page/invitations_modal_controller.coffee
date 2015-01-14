@@ -1,18 +1,21 @@
-angular.module('loomioApp').controller 'InvitationsModalController', ($scope, $modalInstance, group, Records) ->
+angular.module('loomioApp').controller 'InvitationsModalController', ($scope, $modalInstance, group, InvitablesClient, InvitationsClient, Records) ->
   $scope.group = group
   $scope.fragment = ''
   $scope.invitations = []
+
+  invitablesClient = new InvitablesClient()
+  invitationsClient = new InvitationsClient()
 
   $scope.hasInvitations = ->
     $scope.invitations.length > 0
 
   $scope.getInvitables = (fragment) ->
-    Records.invitables.fetchByNameFragment(fragment, $scope.group.id).then $scope.handleInvitables
+    invitablesClient.getByNameFragment(fragment, $scope.group.id).then $scope.handleInvitables
 
-  $scope.handleInvitables = (invitables) ->
+  $scope.handleInvitables = (response) ->
     if angular.element('#invitable-email').hasClass('ng-valid-email')
-      invitables.concat [{ name: $scope.fragment, type: 'Email', email: $scope.fragment }]
-    invitables
+      response.data.invitables.concat [{ name: $scope.fragment, type: 'Email', email: $scope.fragment }]
+    response.data.invitables
 
   $scope.addInvitation = (invitation) ->
     $scope.fragment = ''
@@ -20,7 +23,7 @@ angular.module('loomioApp').controller 'InvitationsModalController', ($scope, $m
 
   $scope.submit = ->
     $scope.isDisabled = true
-    Records.invitations.create(invitationsParams()).then($scope.saveSuccess, $scope.saveError)
+    invitationsClient.create(invitationsParams()).then($scope.saveSuccess, $scope.saveError)
 
   invitationsParams = ->
     invitations: $scope.invitations
