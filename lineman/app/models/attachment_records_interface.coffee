@@ -1,24 +1,43 @@
-angular.module('loomioApp').factory 'AttachmentRecordsInterface', ($upload, BaseRecordsInterface, FileUploadService, AttachmentModel) ->
+angular.module('loomioApp').factory 'AttachmentRecordsInterface', ($upload, BaseRecordsInterface, AttachmentModel) ->
   class AttachmentRecordsInterface extends BaseRecordsInterface
-    model: AttachmentModel
+    model:             AttachmentModel
 
     upload: (file, progress, success, failure) ->
-      params = FileUploadService.getParams(file)
+      @getCredentials().then (credentials) =>
+        params = uploadParameters(credentials, file)
+        newAttachment = @recordStore.attachments.initialize attachmentParams(credentials, file)
 
-      @newAttachment = @recordStore.attachments.initialize
-        filename: params.file.name
-        filesize: params.file.size
-        location: params.url + params.data.key
-
-      $upload.upload(params)
-             .progress(progress)
-             .error(failure)
-             .abort(failure)
-             .success (response, status, xhr, data) =>
-                @save @newAttachment, (response) ->
-                  attachment = @recordStore.attachments.new(response['attachments'][0])
-                  success(attachment)
-                , failure(response)
+        $upload.upload(params)
+               .progress(progress)
+               .error(failure)
+               .abort(failure)
+               .success (response) ->
+                  newAttachment.save
+                  success(response)
 
     abortUpload: ->
       $upload.abort()
+
+    getCredentials: ->
+      @restfulClient.get('credentials')
+
+    attachmentParams = (credentials, file) ->
+      filename: file.name
+      filesize: file.size
+      location: uploadKey(credentials, file)
+
+    uploadParameters = (credentials, file) ->
+      url:    credentials.url
+      method: 'POST'
+      file:   file
+      data:
+        utf8:           '✓',
+        acl:            credentials.acl,
+        policy:         credentials.policy,
+        signature:      credentials.signature,
+        AWSAccessKeyId: credentials.accessKey,
+        key:            uploadKey(credentials, file),
+        "Content-Type": file.type or 'application/octet-stream'
+
+    uploadKey = (credentials, file) ->
+      credentials.key.replace('${filename}', file.name)
