@@ -1,5 +1,5 @@
 .comment-form-attachments
-  %button.btn.btn-default#comment-form-attachment-button{type: 'button', ng-hide: 'isAttaching', ng-click: 'openFileUploadDialog()'}
+  %button.btn.btn-default#comment-form-attachment-button{type: 'button', ng-hide: 'isAttaching'}
     %i.fa.fa-lg.fa-paperclip
    %input.hidden{type: 'file', ng_file_select: 'upload($files)'}
   .attachment-in-progress{ng_show: 'isAttaching'}
